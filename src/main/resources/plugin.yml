@@ -1,0 +1,54 @@
+name: BetterEnderChests
+version: '1.2.1'
+main: me.adrianos76.betterEnderChests.BetterEnderChests
+api-version: '1.21'
+commands:
+  ec:
+    usage: '/ec <chestnum>'
+    permission: betterenderchests.use
+  enderchest:
+    usage: '/enderchest <chestnum>'
+    permission: betterenderchests.use
+  endersee:
+    usage: '/endersee <nick> [chestnum]'
+    permission: betterenderchests.endersee
+  enderclear:
+    usage: '/enderclear <nick> [chestnum]'
+    permission: betterenderchests.enderclear
+
+permissions:
+  betterenderchests.use:
+    description: Allows the use of /ec
+    default: op
+
+  betterenderchests.endersee:
+    description: Allows to invsee player enderchests
+    default: op
+
+  betterenderchests.use1:
+    description: Allows the opening of enderchest \#1
+    default: op
+
+  betterenderchests.use2:
+    description: Allows the opening of enderchest \#2
+    default: op
+
+  betterenderchests.use3:
+    description: Allows the opening of enderchest \#3
+    default: op
+
+  betterenderchests.use4:
+    description: Allows the opening of enderchest \#4
+    default: op
+
+  betterenderchests.use5:
+    description: Allows the opening of enderchest \#5
+    default: op
+
+  betterenderchests.use6:
+    description: Allows the opening of enderchest \#6
+    default: op
+
+  betterenderchests.use7:
+    description: Allows the opening of enderchest \#7
+    default: op

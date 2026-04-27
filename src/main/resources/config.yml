@@ -1,0 +1,5 @@
+serverName: "server" # the name for the database, if not needed leave as is
+database:
+  url: "mariadb://localhost:3306/BetterEnderChests"
+  user: "enderchest"
+  password: "YOUR-DATABASE-PASS-HERE"
