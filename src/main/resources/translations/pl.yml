@@ -1,0 +1,20 @@
+#LOGS
+Database-Connection-Retry-Warning: "Połączenie z bazą utracone — próba ponownego połączenia..."
+Database-Reconnect-Success-Message: "Reconnect udany!"
+Database-Reconnect-Fail-Error: "Reconnect nieudany: %err%"
+#MESSAGES
+EnderChest-Cleared-All-Sucessfully-Message: "Wyczyszczono enderchesty gracza %player%"
+EnderSee-Usage-Message: "§cUsage: /endersee <nick> [chestnum]"
+#Strings
+EnderChest: "Ender chest"
+EnderChest-Prefix: "Ender chest #"
+EnderChest-Short-Prefix: "ec #"
+#ERRORS
+No-Permissions-Error: "§cNie masz permisji!"
+Number-Phrasing-Error: "Error parsing number"
+EnderChest-Save-Error: "Save Ender Chest error: %err%"
+SQL-Insert-Error: "Insert error: %err%"
+SQL-Select-Error: "Select error: %err%"
+Database-Connection-Error: "Nie można połączyć z bazą danych!"
+Incorrect-Number-Error: "§cTo nie jest poprawna liczba!"
+Config-MissingDatabase-Settings: "Config is missing required database settings!"

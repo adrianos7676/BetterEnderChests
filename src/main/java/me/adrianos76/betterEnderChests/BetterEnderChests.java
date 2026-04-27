@@ -1,11 +1,12 @@
 package me.adrianos76.betterEnderChests;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +22,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.sql.*;
 import java.util.Base64;
 import java.util.HashMap;
@@ -30,10 +32,14 @@ import java.util.UUID;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
+//TODO: Auto database creation
+//TODO: Divide the code into classes
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
     Connection dbConnection;
     int serverID;
+
+    FileConfiguration langConfig;
 
     private final Map<UUID, Inventory> playersWithOpenInventories = new HashMap<>();
     // UUID admina → nazwa gracza którego chest ogląda
@@ -42,6 +48,25 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     private String dbUrl;
     private String dbUser;
     private String dbPassword;
+
+    public String getStringFromLangConfig(String key) {
+        return getStringFromLangConfig(key, new HashMap<>());
+    }
+
+    public String getStringFromLangConfig(String key, Map<String, String> variables) {
+        String str = langConfig.getString(key);
+
+        if (str == null) {
+            getLogger().warning("Could not find message for key: " + key);
+            return "There's no message for that key, chceck the config";
+        }
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            str = str.replace(entry.getKey(), entry.getValue());
+        }
+
+        return str;
+    }
 
     private boolean ensureConnection() {
         try {
@@ -52,7 +77,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             getLogger().warning("Sprawdzenie połączenia nieudane: " + e.getMessage());
         }
 
-        getLogger().warning("Połączenie z bazą utracone — próba reconnectu...");
+        getLogger().warning(getStringFromLangConfig("Database-Connection-Retry-Warning"));
 
         try {
             if (dbConnection != null && !dbConnection.isClosed()) {
@@ -62,10 +87,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         try {
             dbConnection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-            getLogger().info("Reconnect udany!");
+            getLogger().info(getStringFromLangConfig("Database-Reconnect-Success-Message"));
             return true;
         } catch (SQLException e) {
-            getLogger().severe("Reconnect nieudany: " + e.getMessage());
+            Map<String, String> variables = new HashMap<>();
+            variables.put("%err%", e.getMessage());
+            getLogger().severe(getStringFromLangConfig("Database-Reconnect-Fail-Error",  variables));
             return false;
         }
     }
@@ -123,7 +150,9 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     }
                 }
             } catch (SQLException e) {
-                Bukkit.getLogger().severe("Select error: " + e.getMessage());
+                Map<String, String> variables = new HashMap<String, String>();
+                variables.put("%err%", e.getMessage());
+                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Select-Error", variables));
             }
 
             try (PreparedStatement insertStmt = dbConnection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -137,7 +166,9 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 }
 
             } catch (SQLException e) {
-                Bukkit.getLogger().severe("Insert error: " + e.getMessage());
+                Map<String, String> variables = new HashMap<String, String>();
+                variables.put("%err%", e.getMessage());
+                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Insert-Error", variables));
             }
         }
         return 0;
@@ -244,7 +275,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public void showEnderChestGUI(Player player, String playerToShow) {
-        Inventory gui = Bukkit.createInventory(null, 27, "Ender chest");
+        Inventory gui = Bukkit.createInventory(null, 27, getStringFromLangConfig("EnderChest"));
 
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 
@@ -270,7 +301,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     enderChestMeta.getPersistentDataContainer().set(enderChestOwnerKey, PersistentDataType.STRING, playerToShow);
                 }
 
-                enderChestMeta.setDisplayName(ChatColor.DARK_PURPLE + "Ender Chest #" + i);
+                enderChestMeta.setDisplayName(getStringFromLangConfig("EnderChest-Prefix") + i);
                 enderChest.setItemMeta(enderChestMeta);
                 gui.setItem(9 + i, enderChest);
             } else {
@@ -278,7 +309,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 ItemMeta barrierMeta = barrier.getItemMeta();
 
                 barrierMeta.getPersistentDataContainer().set(unpickableKey, PersistentDataType.BYTE, (byte) 1);
-                barrierMeta.setDisplayName(ChatColor.DARK_PURPLE + "Ender Chest #" + i);
+                barrierMeta.setDisplayName(getStringFromLangConfig("EnderChest-Prefix") + i);
 
                 barrier.setItemMeta(barrierMeta);
                 gui.setItem(9 + i, barrier);
@@ -308,29 +339,28 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
      *                   If false, checks if player has admin permission to view another player's chest (betterenderchests.endersee).
      */
     public void showEnderChest(Player player, String playerName, Integer num, boolean ownView) {
-        num = Math.clamp(num, 1, 7);
+        num = Math.max(1, Math.min(num, 7));
 
         if (ownView) {
             if (!player.hasPermission("betterenderchests.use" + num)) {
-                player.sendMessage("§cNie masz permisji!");
+                player.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
                 return;
             }
             viewingAs.remove(player.getUniqueId()); // własny chest — wyczyść wpis admina
         } else {
             if (!player.hasPermission("betterenderchests.endersee")) {
-                player.sendMessage("§cNie masz permisji!");
+                player.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
                 return;
             }
             viewingAs.put(player.getUniqueId(), playerName); // zapamiętaj czyj chest ogląda
         }
 
-        String title = ownView ? "Ender chest #" + num : "Ec #" + num + " gracza " + playerName;
+        String title = ownView ? getStringFromLangConfig("EnderChest-Prefix") + num : getStringFromLangConfig("EnderChest-Short-Prefix") + num + " gracza " + playerName;
 
         Inventory gui = Bukkit.createInventory(null, 27, title);
 
         ItemStack[] contents = loadEnderChestFromDB(playerName, num);
         gui.setContents(contents);
-
 
         playersWithOpenInventories.put(player.getUniqueId(), gui);
 
@@ -375,7 +405,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     try {
                         num = Integer.parseInt(args[0]);
                     } catch (NumberFormatException e) {
-                        player.sendMessage("§cTo nie jest poprawna liczba!");
+                        player.sendMessage(getStringFromLangConfig("Incorrect-Number-Error"));
                         return true;
                     }
                     showEnderChest(player, player.getName(), num);
@@ -390,12 +420,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     try {
                         num = Integer.parseInt(args[1]);
                     } catch (NumberFormatException e) {
-                        player.sendMessage("§cTo nie jest poprawna liczba!");
+                        player.sendMessage(getStringFromLangConfig("Incorrect-Number-Error"));
                         return true;
                     }
                     showEnderChest(player, args[0], num, false);
                 } else {
-                    sender.sendMessage("§cUsage: /endersee <nick> [chestnum]");
+                    sender.sendMessage(getStringFromLangConfig("EnderSee-Usage-Message"));
                 }
                 return true;
             } else if (command.getName().equalsIgnoreCase("enderclear")) {
@@ -414,7 +444,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                         return true;
                     }
                 } else {
-                    sender.sendMessage("§xa[BetterEnderChests] Nie masz permisji!");
+                    sender.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
                 }
             }
         }
@@ -429,10 +459,10 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         String title = event.getView().getTitle();
 
         String prefix;
-        if (title.startsWith("Ender chest #")) {
-            prefix = "Ender chest #";
-        } else if (title.startsWith("Ec #")) {
-            prefix = "Ec #";
+        if (title.startsWith(getStringFromLangConfig("EnderChest-Prefix"))) {
+            prefix = getStringFromLangConfig("EnderChest-Prefix");
+        } else if (title.startsWith(getStringFromLangConfig("EnderChest-Short-Prefix"))) {
+            prefix = getStringFromLangConfig("EnderChest-Short-Prefix");
         } else {
             return;
         }
@@ -441,7 +471,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         try {
             chestNumber = Integer.parseInt(title.replace(prefix, "").split(" ")[0]);
         } catch (NumberFormatException e) {
-            Bukkit.getLogger().warning("Error parsing number.");
+            Bukkit.getLogger().warning(getStringFromLangConfig("Number-Phrasing-Error"));
             return;
         }
 
@@ -467,19 +497,29 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         saveDefaultConfig();
 
+        String lang = getConfig().getString("lang");
+
+        File langFile = new File(getDataFolder(), "translations/" + lang + ".yml");
+
+        if (!langFile.exists()) {
+            saveResource("translations/" + lang + ".yml", false);
+        }
+
+        langConfig = YamlConfiguration.loadConfiguration(langFile);
+
         String serverName = getConfig().getString("serverName");
         dbUrl = "jdbc:" + getConfig().getString("database.url");
         dbUser = getConfig().getString("database.user");
         dbPassword = getConfig().getString("database.password");
 
         if (serverName == null || dbUrl == null || dbUser == null || dbPassword == null) {
-            getLogger().severe("Config is missing required database settings!");
+            getLogger().severe(getStringFromLangConfig("Config-MissingDatabase-Settings"));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!ensureConnection()) {
-            getLogger().severe("Nie można połączyć z bazą danych!");
+            getLogger().severe(getStringFromLangConfig("Database-Connection-Error"));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
