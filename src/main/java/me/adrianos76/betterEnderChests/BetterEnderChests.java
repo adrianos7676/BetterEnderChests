@@ -41,7 +41,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     FileConfiguration langConfig;
 
     private final Map<UUID, Inventory> playersWithOpenInventories = new HashMap<>();
-    // UUID admina → nazwa gracza którego chest ogląda
+
     private final Map<UUID, String> viewingAs = new HashMap<>();
 
     private String dbUrl;
@@ -137,7 +137,6 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         }
     }
 
-    // Checks if a user is in the db, if not then it adds the user
     public int getUserFromDB(String userName) {
         if (ensureConnection()) {
             String selectQuery = "SELECT id FROM user WHERE name = ?";
@@ -261,10 +260,8 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             String enderChestOwner = meta.getPersistentDataContainer().get(enderChestOwnerKey, PersistentDataType.STRING);
 
             if (enderChestOwner != null) {
-                // Admin klika w GUI endersee — otwiera chest innego gracza
                 showEnderChest(player, enderChestOwner, enderChestNumberValue, false);
             } else {
-                // Normalny gracz klika własne GUI
                 showEnderChest(player, player.getName(), enderChestNumberValue, true);
             }
         }
@@ -334,15 +331,6 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         showEnderChest(player, playerName, num, true);
     }
 
-    /**
-     * Opens an ender chest GUI for a player.
-     *
-     * @param player     The player who will see the GUI.
-     * @param playerName The owner of the ender chest being displayed.
-     * @param num        The ender chest number (1-7).
-     * @param ownView    If true, checks if player has permission to open their own chest (betterenderchests.useN).
-     *                   If false, checks if player has admin permission to view another player's chest (betterenderchests.endersee).
-     */
     public void showEnderChest(Player player, String playerName, Integer num, boolean ownView) {
         num = Math.max(1, Math.min(num, 7));
 
@@ -566,7 +554,6 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             return;
         }
 
-        //Create database if something is missing
         String setupQuery = """
                 CREATE TABLE IF NOT EXISTS `user` (
                     `id` int(11) NOT NULL AUTO_INCREMENT,
