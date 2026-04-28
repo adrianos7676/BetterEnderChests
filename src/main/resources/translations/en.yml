@@ -1,0 +1,21 @@
+#LOGS
+Database-Connection-Retry-Warning: "Database connection lost — attempting to reconnect..."
+Database-Reconnect-Success-Message: "Reconnect successful!"
+Database-Reconnect-Fail-Error: "Reconnect failed: %err%"
+#MESSAGES
+EnderChest-Cleared-All-Sucessfully-Message: "Successfully cleared ender chests of player %player%"
+EnderSee-Usage-Message: "§cUsage: /endersee <nick> [chestnum]"
+#Strings
+EnderChest: "Ender chest"
+EnderChest-Prefix: "Ender chest #"
+EnderChest-Short-Prefix: "ec #"
+#ERRORS
+No-Permissions-Error: "§cYou don't have permission!"
+Number-Phrasing-Error: "Error parsing number"
+EnderChest-Save-Error: "Ender Chest save error: %err%"
+SQL-Error: "SQL error: %err%"
+SQL-Insert-Error: "INSERT error: %err%"
+SQL-Select-Error: "SELECT error: %err%"
+Database-Connection-Error: "Unable to connect to the database!"
+Incorrect-Number-Error: "§cThat is not a valid number!"
+Config-MissingDatabase-Settings: "Config is missing required database settings!"

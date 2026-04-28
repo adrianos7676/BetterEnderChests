@@ -1,0 +1,21 @@
+#LOGS
+Database-Connection-Retry-Warning: "З'єднання з базою даних втрачено — спроба повторного підключення..."
+Database-Reconnect-Success-Message: "Повторне підключення успішне!"
+Database-Reconnect-Fail-Error: "Повторне підключення не вдалося: %err%"
+#MESSAGES
+EnderChest-Cleared-All-Sucessfully-Message: "Ендер-скрині гравця %player% успішно очищено"
+EnderSee-Usage-Message: "§cВикористання: /endersee <нік> [номерСкрині]"
+#Strings
+EnderChest: "Ендер-скриня"
+EnderChest-Prefix: "Ендер-скриня #"
+EnderChest-Short-Prefix: "ec #"
+#ERRORS
+No-Permissions-Error: "§cУ вас немає дозволу!"
+Number-Phrasing-Error: "Помилка розбору числа"
+EnderChest-Save-Error: "Помилка збереження Ендер-скрині: %err%"
+SQL-Error: "Помилка SQL: %err%"
+SQL-Insert-Error: "Помилка INSERT: %err%"
+SQL-Select-Error: "Помилка SELECT: %err%"
+Database-Connection-Error: "Неможливо підключитися до бази даних!"
+Incorrect-Number-Error: "§cЦе недійсне число!"
+Config-MissingDatabase-Settings: "У конфігурації відсутні необхідні налаштування бази даних!"

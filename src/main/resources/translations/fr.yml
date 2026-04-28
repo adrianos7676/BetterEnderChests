@@ -1,0 +1,21 @@
+#LOGS
+Database-Connection-Retry-Warning: "Connexion à la base de données perdue — tentative de reconnexion..."
+Database-Reconnect-Success-Message: "Reconnexion réussie !"
+Database-Reconnect-Fail-Error: "Reconnexion échouée : %err%"
+#MESSAGES
+EnderChest-Cleared-All-Sucessfully-Message: "Les ender chests du joueur %player% ont été vidés avec succès"
+EnderSee-Usage-Message: "§cUtilisation : /endersee <pseudo> [numCoffre]"
+#Strings
+EnderChest: "Coffre de l'Ender"
+EnderChest-Prefix: "Coffre de l'Ender #"
+EnderChest-Short-Prefix: "ec #"
+#ERRORS
+No-Permissions-Error: "§cVous n'avez pas la permission !"
+Number-Phrasing-Error: "Erreur d'analyse du nombre"
+EnderChest-Save-Error: "Erreur de sauvegarde du coffre de l'Ender : %err%"
+SQL-Error: "Erreur SQL : %err%"
+SQL-Insert-Error: "Erreur INSERT : %err%"
+SQL-Select-Error: "Erreur SELECT : %err%"
+Database-Connection-Error: "Impossible de se connecter à la base de données !"
+Incorrect-Number-Error: "§cCe n'est pas un nombre valide !"
+Config-MissingDatabase-Settings: "La configuration manque des paramètres de base de données requis !"

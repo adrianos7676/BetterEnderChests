@@ -1,0 +1,21 @@
+#LOGS
+Database-Connection-Retry-Warning: "Соединение с базой данных потеряно — попытка переподключения..."
+Database-Reconnect-Success-Message: "Переподключение успешно!"
+Database-Reconnect-Fail-Error: "Переподключение не удалось: %err%"
+#MESSAGES
+EnderChest-Cleared-All-Sucessfully-Message: "Эндер-сундуки игрока %player% успешно очищены"
+EnderSee-Usage-Message: "§cИспользование: /endersee <ник> [номерСундука]"
+#Strings
+EnderChest: "Эндер-сундук"
+EnderChest-Prefix: "Эндер-сундук #"
+EnderChest-Short-Prefix: "ec #"
+#ERRORS
+No-Permissions-Error: "§cУ вас нет прав!"
+Number-Phrasing-Error: "Ошибка разбора числа"
+EnderChest-Save-Error: "Ошибка сохранения Эндер-сундука: %err%"
+SQL-Error: "Ошибка SQL: %err%"
+SQL-Insert-Error: "Ошибка INSERT: %err%"
+SQL-Select-Error: "Ошибка SELECT: %err%"
+Database-Connection-Error: "Невозможно подключиться к базе данных!"
+Incorrect-Number-Error: "§cЭто недопустимое число!"
+Config-MissingDatabase-Settings: "В конфигурации отсутствуют обязательные настройки базы данных!"

@@ -32,7 +32,6 @@ import java.util.UUID;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
-//TODO: Auto database creation
 //TODO: Divide the code into classes
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
@@ -522,6 +521,56 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             getLogger().severe(getStringFromLangConfig("Database-Connection-Error"));
             getServer().getPluginManager().disablePlugin(this);
             return;
+        }
+
+        //Create database if something is missing
+        String setupQuery = """
+                CREATE TABLE IF NOT EXISTS `user` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `name` varchar(16) NOT NULL,
+                    PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                
+                CREATE TABLE IF NOT EXISTS `server` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `name` varchar(100) NOT NULL,
+                    PRIMARY KEY (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                
+                CREATE TABLE IF NOT EXISTS `item` (
+                    `id` int(11) NOT NULL AUTO_INCREMENT,
+                    `user_id` int(11) NOT NULL,
+                    `server_id` int(11) NOT NULL,
+                    `itemdata` text DEFAULT NULL,
+                    `enderchest_number` int(11) NOT NULL,
+                
+                    PRIMARY KEY (`id`),
+                    UNIQUE KEY `unique_chest` (`user_id`,`server_id`,`enderchest_number`),
+                    KEY `server_id` (`server_id`),
+                
+                    CONSTRAINT `item_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                    CONSTRAINT `item_ibfk_2` FOREIGN KEY (`server_id`) REFERENCES `server` (`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                """;
+
+        StringBuilder currentQuery = new StringBuilder();
+
+        for (String line : setupQuery.split("\n")) {
+
+            line = line.trim();
+
+            if (line.startsWith("--") || line.isEmpty()) continue;
+
+            currentQuery.append(line);
+
+            if (line.endsWith(";")) {
+                try (Statement stmt = dbConnection.createStatement()) {
+                    stmt.execute(currentQuery.toString());
+                } catch (SQLException e) {
+                    getLogger().severe("SQL error: " + e.getMessage());
+                }
+                currentQuery.setLength(0);
+            }
         }
 
         String query = "SELECT id FROM server WHERE name = ?";
