@@ -1,7 +1,6 @@
 #LOGS
 Database-Connection-Retry-Warning: "Połączenie z bazą utracone — próba ponownego połączenia..."
 Database-Reconnect-Success-Message: "Ponowne połączenie udane!"
-Database-Reconnect-Fail-Error: "Ponowne połączenie nieudane: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Wyczyszczono enderchesty gracza %player%"
 EnderSee-Usage-Message: "§cUżycie: /endersee <nick> [numerSkrzyni]"
@@ -11,6 +10,7 @@ EnderChest: "Ender chest"
 EnderChest-Prefix: "Ender chest #"
 EnderChest-Short-Prefix: "ec #"
 #ERRORS
+Database-Reconnect-Fail-Error: "Ponowne połączenie nieudane: %err%"
 No-Permissions-Error: "§cNie masz permisji!"
 Number-Phrasing-Error: "Błąd parsowania liczby"
 EnderChest-Save-Error: "Błąd zapisu Ender Chest: %err%"

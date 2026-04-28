@@ -1,7 +1,6 @@
 #LOGS
 Database-Connection-Retry-Warning: "Соединение с базой данных потеряно — попытка переподключения..."
 Database-Reconnect-Success-Message: "Переподключение успешно!"
-Database-Reconnect-Fail-Error: "Переподключение не удалось: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Эндер-сундуки игрока %player% успешно очищены"
 EnderSee-Usage-Message: "§cИспользование: /endersee <ник> [номерСундука]"
@@ -11,6 +10,7 @@ EnderChest: "Эндер-сундук"
 EnderChest-Prefix: "Эндер-сундук #"
 EnderChest-Short-Prefix: "ec #"
 #ERRORS
+Database-Reconnect-Fail-Error: "Переподключение не удалось: %err%"
 No-Permissions-Error: "§cУ вас нет прав!"
 Number-Phrasing-Error: "Ошибка разбора числа"
 EnderChest-Save-Error: "Ошибка сохранения Эндер-сундука: %err%"

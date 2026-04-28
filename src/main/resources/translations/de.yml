@@ -1,7 +1,6 @@
 #LOGS
 Database-Connection-Retry-Warning: "Datenbankverbindung unterbrochen — Wiederverbindungsversuch..."
 Database-Reconnect-Success-Message: "Wiederverbindung erfolgreich!"
-Database-Reconnect-Fail-Error: "Wiederverbindung fehlgeschlagen: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Ender Chests von Spieler %player% wurden erfolgreich geleert"
 EnderSee-Usage-Message: "§cVerwendung: /endersee <nick> [Kistennum]"
@@ -11,6 +10,7 @@ EnderChest: "Ender-Truhe"
 EnderChest-Prefix: "Ender-Truhe #"
 EnderChest-Short-Prefix: "ec #"
 #ERRORS
+Database-Reconnect-Fail-Error: "Wiederverbindung fehlgeschlagen: %err%"
 No-Permissions-Error: "§cDu hast keine Berechtigung!"
 Number-Phrasing-Error: "Fehler beim Parsen der Zahl"
 EnderChest-Save-Error: "Fehler beim Speichern der Ender-Truhe: %err%"

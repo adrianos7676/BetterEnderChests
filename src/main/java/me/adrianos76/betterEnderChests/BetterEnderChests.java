@@ -57,7 +57,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         if (str == null) {
             getLogger().warning("Could not find message for key: " + key);
-            return "There's no message for that key, chceck the config";
+            return "There's no message for that key, check the config";
         }
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
@@ -73,7 +73,9 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 return true;
             }
         } catch (SQLException e) {
-            getLogger().warning("Sprawdzenie połączenia nieudane: " + e.getMessage());
+            Map<String, String> params = new HashMap<>();
+            params.put("%err%", e.getMessage());
+            getLogger().warning(getStringFromLangConfig("Database-Reconnect-Fail-Error", params));
         }
 
         getLogger().warning(getStringFromLangConfig("Database-Connection-Retry-Warning"));
@@ -191,7 +193,9 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 stmt.setString(4, base64);
                 stmt.executeUpdate();
             } catch (SQLException e) {
-                Bukkit.getLogger().severe("Save Ender Chest error: " + e.getMessage());
+                Map<String, String> variables = new HashMap<>();
+                variables.put("%err%", e.getMessage());
+                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Error", variables));
             }
         }
     }
@@ -213,7 +217,9 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     }
                 }
             } catch (SQLException e) {
-                Bukkit.getLogger().severe("Load Ender Chest error: " + e.getMessage());
+                Map<String, String> variables = new HashMap<>();
+                variables.put("%err%", e.getMessage());
+                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Error", variables));
             }
         }
         return new ItemStack[27];

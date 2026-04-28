@@ -1,7 +1,6 @@
 #LOGS
 Database-Connection-Retry-Warning: "З'єднання з базою даних втрачено — спроба повторного підключення..."
 Database-Reconnect-Success-Message: "Повторне підключення успішне!"
-Database-Reconnect-Fail-Error: "Повторне підключення не вдалося: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Ендер-скрині гравця %player% успішно очищено"
 EnderSee-Usage-Message: "§cВикористання: /endersee <нік> [номерСкрині]"
@@ -11,6 +10,7 @@ EnderChest: "Ендер-скриня"
 EnderChest-Prefix: "Ендер-скриня #"
 EnderChest-Short-Prefix: "ec #"
 #ERRORS
+Database-Reconnect-Fail-Error: "Повторне підключення не вдалося: %err%"
 No-Permissions-Error: "§cУ вас немає дозволу!"
 Number-Phrasing-Error: "Помилка розбору числа"
 EnderChest-Save-Error: "Помилка збереження Ендер-скрині: %err%"

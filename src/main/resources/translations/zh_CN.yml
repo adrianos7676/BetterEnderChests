@@ -1,7 +1,6 @@
 #LOGS
 Database-Connection-Retry-Warning: "数据库连接已断开 — 正在尝试重新连接..."
 Database-Reconnect-Success-Message: "重新连接成功！"
-Database-Reconnect-Fail-Error: "重新连接失败：%err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "已成功清空玩家 %player% 的末影箱"
 EnderSee-Usage-Message: "§c用法：/endersee <昵称> [箱子编号]"
@@ -11,6 +10,7 @@ EnderChest: "末影箱"
 EnderChest-Prefix: "末影箱 #"
 EnderChest-Short-Prefix: "ec #"
 #ERRORS
+Database-Reconnect-Fail-Error: "重新连接失败：%err%"
 No-Permissions-Error: "§c你没有权限！"
 Number-Phrasing-Error: "数字解析错误"
 EnderChest-Save-Error: "末影箱保存错误：%err%"
