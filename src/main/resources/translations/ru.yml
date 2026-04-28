@@ -5,6 +5,7 @@ Database-Reconnect-Fail-Error: "Переподключение не удалос
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Эндер-сундуки игрока %player% успешно очищены"
 EnderSee-Usage-Message: "§cИспользование: /endersee <ник> [номерСундука]"
+Plugin-Update-Available: "[BetterEnderChests] Доступна новая версия плагина: %ver%"
 #Strings
 EnderChest: "Эндер-сундук"
 EnderChest-Prefix: "Эндер-сундук #"
@@ -19,3 +20,4 @@ SQL-Select-Error: "Ошибка SELECT: %err%"
 Database-Connection-Error: "Невозможно подключиться к базе данных!"
 Incorrect-Number-Error: "§cЭто недопустимое число!"
 Config-MissingDatabase-Settings: "В конфигурации отсутствуют обязательные настройки базы данных!"
+Plugin-Update-Error: "[BetterEnderChests] Произошла ошибка при проверке обновления плагина."

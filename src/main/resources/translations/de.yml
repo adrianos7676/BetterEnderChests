@@ -5,6 +5,7 @@ Database-Reconnect-Fail-Error: "Wiederverbindung fehlgeschlagen: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Ender Chests von Spieler %player% wurden erfolgreich geleert"
 EnderSee-Usage-Message: "§cVerwendung: /endersee <nick> [Kistennum]"
+Plugin-Update-Available: "[BetterEnderChests] Eine neue Plugin-Version ist verfügbar: %ver%"
 #Strings
 EnderChest: "Ender-Truhe"
 EnderChest-Prefix: "Ender-Truhe #"
@@ -19,3 +20,4 @@ SQL-Select-Error: "Auswahlfehler: %err%"
 Database-Connection-Error: "Verbindung zur Datenbank nicht möglich!"
 Incorrect-Number-Error: "§cDas ist keine gültige Zahl!"
 Config-MissingDatabase-Settings: "In der Konfiguration fehlen erforderliche Datenbankeinstellungen!"
+Plugin-Update-Error: "[BetterEnderChests] Beim Überprüfen des Plugin-Updates ist ein Fehler aufgetreten."

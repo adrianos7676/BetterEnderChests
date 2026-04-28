@@ -14,21 +14,22 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
+import java.net.URL;
 import java.sql.*;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
@@ -385,6 +386,43 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+
+        if (player.hasPermission("betterenderchests.updatemessages")) {
+            Bukkit.getServer().getScheduler().runTaskAsynchronously(this, () -> {
+                try {
+                    String localVersion = getDescription().getVersion();
+                    String remoteVersion;
+
+                    URL url = new URL("https://api.github.com/repos/adrianos7676/BetterEnderChests/releases/latest");
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    reader.close();
+
+                    String json = response.toString();
+
+                    remoteVersion = json.split("\"tag_name\":\"")[1].split("\"")[0];
+
+                    if (!remoteVersion.equalsIgnoreCase(localVersion)) {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("%ver%", remoteVersion);
+                        player.sendMessage(getStringFromLangConfig("Plugin-Update-Available", params));
+                    }
+
+                } catch (Exception e) {
+                    Bukkit.getLogger().warning(getStringFromLangConfig("Plugin-Update-Error"));
+                }
+            });
         }
     }
 

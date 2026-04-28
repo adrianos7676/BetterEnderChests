@@ -52,3 +52,6 @@ permissions:
   betterenderchests.use7:
     description: Allows the opening of enderchest \#7
     default: op
+  betterenderchests.updatemessages:
+    description: Sends the user information, when the plugin is not the current version on github
+    default: op

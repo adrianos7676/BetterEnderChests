@@ -5,6 +5,7 @@ Database-Reconnect-Fail-Error: "Reconnect failed: %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Successfully cleared ender chests of player %player%"
 EnderSee-Usage-Message: "§cUsage: /endersee <nick> [chestnum]"
+Plugin-Update-Available: "[BetterEnderChests] New version available: %ver%"
 #Strings
 EnderChest: "Ender chest"
 EnderChest-Prefix: "Ender chest #"
@@ -19,3 +20,4 @@ SQL-Select-Error: "SELECT error: %err%"
 Database-Connection-Error: "Unable to connect to the database!"
 Incorrect-Number-Error: "§cThat is not a valid number!"
 Config-MissingDatabase-Settings: "Config is missing required database settings!"
+Plugin-Update-Error: "[BetterEnderChests] There was an error checking updates."

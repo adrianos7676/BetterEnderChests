@@ -5,6 +5,7 @@ Database-Reconnect-Fail-Error: "Reconnexion échouée : %err%"
 #MESSAGES
 EnderChest-Cleared-All-Sucessfully-Message: "Les ender chests du joueur %player% ont été vidés avec succès"
 EnderSee-Usage-Message: "§cUtilisation : /endersee <pseudo> [numCoffre]"
+Plugin-Update-Available: "[BetterEnderChests] Une nouvelle version du plugin est disponible : %ver%"
 #Strings
 EnderChest: "Coffre de l'Ender"
 EnderChest-Prefix: "Coffre de l'Ender #"
@@ -19,3 +20,4 @@ SQL-Select-Error: "Erreur SELECT : %err%"
 Database-Connection-Error: "Impossible de se connecter à la base de données !"
 Incorrect-Number-Error: "§cCe n'est pas un nombre valide !"
 Config-MissingDatabase-Settings: "La configuration manque des paramètres de base de données requis !"
+Plugin-Update-Error: "[BetterEnderChests] Une erreur s'est produite lors de la vérification de la mise à jour du plugin."
