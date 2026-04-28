@@ -81,7 +81,7 @@ On startup, it automatically creates:
 - Ukrainian
 - Chinese (Simplified)
 
-## 🧱 Installation
+## Installation
 
 1. Download the plugin `.jar`
 2. Place it into your `/plugins` folder
@@ -94,7 +94,7 @@ On startup, it automatically creates:
 
 ---
 
-## ⚙️ Requirements
+##  Requirements
 
 * Java 17+
 * Spigot / Paper 1.16+
@@ -102,21 +102,13 @@ On startup, it automatically creates:
 
 ---
 
-## 🚧 Known Limitations
-
-* No GUI pagination (fixed 27-slot inventory)
-* Chest limit hardcoded to 7 tiers
-* No async inventory loading (DB calls happen synchronously in some paths)
-
----
-
-## 🛠 Author
+## Author
 
 Developed by **Adrianos76**
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the GNU General Public License v3.0 (GPLv3).
 
