@@ -1,6 +1,7 @@
 package me.adrianos76.betterEnderChests.Config;
 
 import me.adrianos76.betterEnderChests.BetterEnderChests;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LanguageConfigManager {
     BetterEnderChests plugin;
@@ -119,16 +122,31 @@ public class LanguageConfigManager {
 
     public String getString(String key, Map<String, String> variables) {
         String str = this.config.getString(key);
-
         if (str == null) {
             plugin.getLogger().warning("Could not find message for key: " + key);
             return "There's no message for that key, check the config";
         }
 
+        str = ChatColor.translateAlternateColorCodes('&', str);
+        str = translateHexColorCodes(str);
+
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             str = str.replace(entry.getKey(), entry.getValue());
         }
-
         return str;
+    }
+
+    private String translateHexColorCodes(String str) {
+        Pattern pattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
+        Matcher matcher = pattern.matcher(str);
+        StringBuffer buffer = new StringBuffer();
+
+        while (matcher.find()) {
+            String hex = matcher.group(1);
+            StringBuilder replacement = new StringBuilder(net.md_5.bungee.api.ChatColor.of("#" + hex).toString());
+            matcher.appendReplacement(buffer, replacement.toString());
+        }
+        matcher.appendTail(buffer);
+        return buffer.toString();
     }
 }
