@@ -80,21 +80,38 @@ public class LanguageConfigManager {
             throw new RuntimeException(e);
         }
 
+        plugin.getLogger().info("JAR path: " + jarFile.getAbsolutePath());
+        plugin.getLogger().info("JAR exists: " + jarFile.exists());
+
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
+            boolean foundAny = false;
+
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
                 String name = entry.getName();
-                if (name.startsWith("translations/") && name.endsWith(".yml")) {
-                    File file = new File(plugin.getDataFolder(), name);
-                    file.getParentFile().mkdirs();
 
-                    if (file.exists()) {
-                        updateLanguageConfig(name);
-                    }
+                if (name.startsWith("translations/") && name.endsWith(".yml")) {
+                    foundAny = true;
+                    plugin.getLogger().info("Found translation in JAR: " + name);
+
+                    File file = new File(plugin.getDataFolder(), name);
+                    plugin.getLogger().info("Target file: " + file.getAbsolutePath());
+                    plugin.getLogger().info("Target file exists: " + file.exists());
+
+                    file.getParentFile().mkdirs();
+                    plugin.getLogger().info("mkdirs result: " + file.getParentFile().exists());
+
+                    updateLanguageConfig(name);
                 }
             }
+
+            if (!foundAny) {
+                plugin.getLogger().warning("No translation files found in JAR under translations/");
+            }
+
         } catch (IOException e) {
+            plugin.getLogger().severe("IOException while reading JAR: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

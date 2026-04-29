@@ -27,10 +27,16 @@ public class ConfigManager {
                 plugin.getConfig().set(key, value);
             }
         }
+
+        plugin.saveConfig();
     }
 
     public String getString(String key) {
         return plugin.getConfig().getString(key);
+    }
+
+    public String getString(String key, String def) {
+        return plugin.getConfig().getString(key, def);
     }
 
     public void reloadConfig() {}

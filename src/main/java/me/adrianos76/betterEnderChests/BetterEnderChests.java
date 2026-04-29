@@ -514,7 +514,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         //Update the config if its an old version
         String localVersion = getDescription().getVersion();
-        String configVersion = configManager.getString("configVersion");
+        String configVersion = configManager.getString("configVersion", "0.0");
 
         if (!localVersion.equals(configVersion)) {
             configManager.updateConfig();
@@ -524,10 +524,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         String lang = configManager.getString("lang");
 
         languageConfigManager = new LanguageConfigManager(this, lang);
-
-        if (!localVersion.equals(configVersion)) {
-            languageConfigManager.updateLanguageConfigs();
-        }
+        languageConfigManager.updateLanguageConfigs();
 
         String serverName = getConfig().getString("serverName");
         dbUrl = "jdbc:" + getConfig().getString("database.url");
