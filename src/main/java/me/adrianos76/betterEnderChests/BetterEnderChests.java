@@ -1,14 +1,12 @@
 package me.adrianos76.betterEnderChests;
 
 import me.adrianos76.betterEnderChests.Config.ConfigManager;
+import me.adrianos76.betterEnderChests.Config.LanguageConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,8 +39,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     int serverID;
 
     ConfigManager configManager;
-
-    FileConfiguration langConfig;
+    LanguageConfigManager  languageConfigManager;
 
     private final Map<UUID, Inventory> playersWithOpenInventories = new HashMap<>();
 
@@ -52,25 +49,6 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     private String dbUser;
     private String dbPassword;
 
-    public String getStringFromLangConfig(String key) {
-        return getStringFromLangConfig(key, new HashMap<>());
-    }
-
-    public String getStringFromLangConfig(String key, Map<String, String> variables) {
-        String str = langConfig.getString(key);
-
-        if (str == null) {
-            getLogger().warning("Could not find message for key: " + key);
-            return "There's no message for that key, check the config";
-        }
-
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
-            str = str.replace(entry.getKey(), entry.getValue());
-        }
-
-        return str;
-    }
-
     private boolean ensureConnection() {
         try {
             if (dbConnection != null && !dbConnection.isClosed() && dbConnection.isValid(2)) {
@@ -79,10 +57,10 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         } catch (SQLException e) {
             Map<String, String> params = new HashMap<>();
             params.put("%err%", e.getMessage());
-            getLogger().warning(getStringFromLangConfig("Database-Reconnect-Fail-Error", params));
+            getLogger().warning(languageConfigManager.getString("Database-Reconnect-Fail-Error", params));
         }
 
-        getLogger().warning(getStringFromLangConfig("Database-Connection-Retry-Warning"));
+        getLogger().warning(languageConfigManager.getString("Database-Connection-Retry-Warning"));
 
         try {
             if (dbConnection != null && !dbConnection.isClosed()) {
@@ -92,12 +70,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         try {
             dbConnection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-            getLogger().info(getStringFromLangConfig("Database-Reconnect-Success-Message"));
+            getLogger().info(languageConfigManager.getString("Database-Reconnect-Success-Message"));
             return true;
         } catch (SQLException e) {
             Map<String, String> variables = new HashMap<>();
             variables.put("%err%", e.getMessage());
-            getLogger().severe(getStringFromLangConfig("Database-Reconnect-Fail-Error",  variables));
+            getLogger().severe(languageConfigManager.getString("Database-Reconnect-Fail-Error",  variables));
             return false;
         }
     }
@@ -156,7 +134,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 Map<String, String> variables = new HashMap<String, String>();
                 variables.put("%err%", e.getMessage());
-                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Select-Error", variables));
+                getLogger().severe(languageConfigManager.getString("SQL-Select-Error", variables));
             }
 
             try (PreparedStatement insertStmt = dbConnection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -172,7 +150,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 Map<String, String> variables = new HashMap<String, String>();
                 variables.put("%err%", e.getMessage());
-                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Insert-Error", variables));
+                getLogger().severe(languageConfigManager.getString("SQL-Insert-Error", variables));
             }
         }
         return 0;
@@ -198,7 +176,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 Map<String, String> variables = new HashMap<>();
                 variables.put("%err%", e.getMessage());
-                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Error", variables));
+                getLogger().severe(languageConfigManager.getString("SQL-Error", variables));
             }
         }
     }
@@ -222,7 +200,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             } catch (SQLException e) {
                 Map<String, String> variables = new HashMap<>();
                 variables.put("%err%", e.getMessage());
-                Bukkit.getLogger().severe(getStringFromLangConfig("SQL-Error", variables));
+                getLogger().severe(languageConfigManager.getString("SQL-Error", variables));
             }
         }
         return new ItemStack[27];
@@ -281,7 +259,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public void showEnderChestGUI(Player player, String playerToShow) {
-        Inventory gui = Bukkit.createInventory(null, 27, getStringFromLangConfig("EnderChest"));
+        Inventory gui = Bukkit.createInventory(null, 27, languageConfigManager.getString("EnderChest"));
 
         ItemStack filler = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
 
@@ -307,7 +285,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     enderChestMeta.getPersistentDataContainer().set(enderChestOwnerKey, PersistentDataType.STRING, playerToShow);
                 }
 
-                enderChestMeta.setDisplayName(getStringFromLangConfig("EnderChest-Prefix") + i);
+                enderChestMeta.setDisplayName(languageConfigManager.getString("EnderChest-Prefix") + i);
                 enderChest.setItemMeta(enderChestMeta);
                 gui.setItem(9 + i, enderChest);
             } else {
@@ -315,7 +293,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 ItemMeta barrierMeta = barrier.getItemMeta();
 
                 barrierMeta.getPersistentDataContainer().set(unpickableKey, PersistentDataType.BYTE, (byte) 1);
-                barrierMeta.setDisplayName(getStringFromLangConfig("EnderChest-Prefix") + i);
+                barrierMeta.setDisplayName(languageConfigManager.getString("EnderChest-Prefix") + i);
 
                 barrier.setItemMeta(barrierMeta);
                 gui.setItem(9 + i, barrier);
@@ -336,23 +314,23 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public void showEnderChest(Player player, String playerName, Integer num, boolean ownView) {
-        num = Math.max(1, Math.min(num, 7));
+        num = Math.clamp(num, 1, 7);
 
         if (ownView) {
             if (!player.hasPermission("betterenderchests.use" + num)) {
-                player.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
+                player.sendMessage(languageConfigManager.getString("No-Permissions-Error"));
                 return;
             }
             viewingAs.remove(player.getUniqueId()); // własny chest — wyczyść wpis admina
         } else {
             if (!player.hasPermission("betterenderchests.endersee")) {
-                player.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
+                player.sendMessage(languageConfigManager.getString("No-Permissions-Error"));
                 return;
             }
             viewingAs.put(player.getUniqueId(), playerName); // zapamiętaj czyj chest ogląda
         }
 
-        String title = ownView ? getStringFromLangConfig("EnderChest-Prefix") + num : getStringFromLangConfig("EnderChest-Short-Prefix") + num + " gracza " + playerName;
+        String title = ownView ? languageConfigManager.getString("EnderChest-Prefix") + num : languageConfigManager.getString("EnderChest-Short-Prefix") + num + " gracza " + playerName;
 
         Inventory gui = Bukkit.createInventory(null, 27, title);
 
@@ -413,11 +391,11 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     if (!remoteVersion.equalsIgnoreCase(localVersion)) {
                         Map<String, String> params = new HashMap<>();
                         params.put("%ver%", remoteVersion);
-                        player.sendMessage(getStringFromLangConfig("Plugin-Update-Available", params));
+                        player.sendMessage(languageConfigManager.getString("Plugin-Update-Available", params));
                     }
 
                 } catch (Exception e) {
-                    Bukkit.getLogger().warning(getStringFromLangConfig("Plugin-Update-Error"));
+                    getLogger().warning(languageConfigManager.getString("Plugin-Update-Error"));
                 }
             });
         }
@@ -439,7 +417,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     try {
                         num = Integer.parseInt(args[0]);
                     } catch (NumberFormatException e) {
-                        player.sendMessage(getStringFromLangConfig("Incorrect-Number-Error"));
+                        player.sendMessage(languageConfigManager.getString("Incorrect-Number-Error"));
                         return true;
                     }
                     showEnderChest(player, player.getName(), num);
@@ -454,12 +432,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     try {
                         num = Integer.parseInt(args[1]);
                     } catch (NumberFormatException e) {
-                        player.sendMessage(getStringFromLangConfig("Incorrect-Number-Error"));
+                        player.sendMessage(languageConfigManager.getString("Incorrect-Number-Error"));
                         return true;
                     }
                     showEnderChest(player, args[0], num, false);
                 } else {
-                    sender.sendMessage(getStringFromLangConfig("EnderSee-Usage-Message"));
+                    sender.sendMessage(languageConfigManager.getString("EnderSee-Usage-Message"));
                 }
                 return true;
             } else if (command.getName().equalsIgnoreCase("enderclear")) {
@@ -478,7 +456,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                         return true;
                     }
                 } else {
-                    sender.sendMessage(getStringFromLangConfig("No-Permissions-Error"));
+                    sender.sendMessage(languageConfigManager.getString("No-Permissions-Error"));
                 }
             }
         }
@@ -493,10 +471,10 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         String title = event.getView().getTitle();
 
         String prefix;
-        if (title.startsWith(getStringFromLangConfig("EnderChest-Prefix"))) {
-            prefix = getStringFromLangConfig("EnderChest-Prefix");
-        } else if (title.startsWith(getStringFromLangConfig("EnderChest-Short-Prefix"))) {
-            prefix = getStringFromLangConfig("EnderChest-Short-Prefix");
+        if (title.startsWith(languageConfigManager.getString("EnderChest-Prefix"))) {
+            prefix = languageConfigManager.getString("EnderChest-Prefix");
+        } else if (title.startsWith(languageConfigManager.getString("EnderChest-Short-Prefix"))) {
+            prefix = languageConfigManager.getString("EnderChest-Short-Prefix");
         } else {
             return;
         }
@@ -505,7 +483,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         try {
             chestNumber = Integer.parseInt(title.replace(prefix, "").split(" ")[0]);
         } catch (NumberFormatException e) {
-            Bukkit.getLogger().warning(getStringFromLangConfig("Number-Phrasing-Error"));
+            getLogger().warning(languageConfigManager.getString("Number-Phrasing-Error"));
             return;
         }
 
@@ -541,16 +519,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         if (!localVersion.equals(configVersion)) {
             configManager.updateConfig();
         }
+        
+        //Language Config Manager
+        
+        String lang = configManager.getString("lang");
 
-        String lang = getConfig().getString("lang");
-
-        File langFile = new File(getDataFolder(), "translations/" + lang + ".yml");
-
-        if (!langFile.exists()) {
-            saveResource("translations/" + lang + ".yml", false);
-        }
-
-        langConfig = YamlConfiguration.loadConfiguration(langFile);
+        languageConfigManager = new LanguageConfigManager(this, lang);
 
         String serverName = getConfig().getString("serverName");
         dbUrl = "jdbc:" + getConfig().getString("database.url");
@@ -558,13 +532,13 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         dbPassword = getConfig().getString("database.password");
 
         if (serverName == null || dbUrl == null || dbUser == null || dbPassword == null) {
-            getLogger().severe(getStringFromLangConfig("Config-MissingDatabase-Settings"));
+            getLogger().severe(languageConfigManager.getString("Config-MissingDatabase-Settings"));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!ensureConnection()) {
-            getLogger().severe(getStringFromLangConfig("Database-Connection-Error"));
+            getLogger().severe(languageConfigManager.getString("Database-Connection-Error"));
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
