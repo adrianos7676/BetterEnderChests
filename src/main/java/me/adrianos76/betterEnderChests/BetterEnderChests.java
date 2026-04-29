@@ -2,6 +2,7 @@ package me.adrianos76.betterEnderChests;
 
 import me.adrianos76.betterEnderChests.Config.ConfigManager;
 import me.adrianos76.betterEnderChests.Config.LanguageConfigManager;
+import me.adrianos76.betterEnderChests.Database.ItemStackEncoder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -24,13 +25,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.*;
 import java.net.URL;
 import java.sql.*;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
 //TODO: Divide the code into classes
 
@@ -40,6 +37,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
     ConfigManager configManager;
     public LanguageConfigManager  languageConfigManager;
+    ItemStackEncoder itemStackEncoder;
 
     private final Map<UUID, Inventory> playersWithOpenInventories = new HashMap<>();
 
@@ -80,44 +78,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         }
     }
 
-    public String itemStackArrayToBase64(ItemStack[] items) {
-        try {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
 
-            dataOutput.writeInt(items.length);
-
-            for (ItemStack item : items) {
-                dataOutput.writeObject(item);
-            }
-
-            dataOutput.close();
-            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
-
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to save item stacks.", e);
-        }
-    }
-
-    public ItemStack[] itemStackArrayFromBase64(String data) {
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(data));
-            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
-
-            int length = dataInput.readInt();
-            ItemStack[] items = new ItemStack[length];
-
-            for (int i = 0; i < length; i++) {
-                items[i] = (ItemStack) dataInput.readObject();
-            }
-
-            dataInput.close();
-            return items;
-
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to load item stacks.", e);
-        }
-    }
 
     public int getUserFromDB(String userName) {
         if (ensureConnection()) {
@@ -132,7 +93,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                     }
                 }
             } catch (SQLException e) {
-                Map<String, String> variables = new HashMap<String, String>();
+                Map<String, String> variables = new HashMap<>();
                 variables.put("%err%", e.getMessage());
                 getLogger().severe(languageConfigManager.getString("SQL-Select-Error", variables));
             }
@@ -148,7 +109,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 }
 
             } catch (SQLException e) {
-                Map<String, String> variables = new HashMap<String, String>();
+                Map<String, String> variables = new HashMap<>();
                 variables.put("%err%", e.getMessage());
                 getLogger().severe(languageConfigManager.getString("SQL-Insert-Error", variables));
             }
@@ -165,7 +126,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             """;
 
             int userID = getUserFromDB(userName);
-            String base64 = itemStackArrayToBase64(items);
+            String base64 = itemStackEncoder.itemStackArrayToBase64(items);
 
             try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, userID);
@@ -194,7 +155,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         String base64 = rs.getString("itemdata");
-                        return itemStackArrayFromBase64(base64);
+                        return itemStackEncoder.itemStackArrayFromBase64(base64);
                     }
                 }
             } catch (SQLException e) {
@@ -507,12 +468,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
 
-        //Config Manager
+        //Config Manager setup
         configManager = new ConfigManager(this);
 
         configManager.saveDefaultConfig();
 
-        //Update the config if its an old version
+        //Update the config if it's an old version
         String localVersion = getDescription().getVersion();
         String configVersion = configManager.getString("configVersion", "0.0");
 
@@ -520,12 +481,16 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             configManager.updateConfig();
         }
         
-        //Language Config Manager
+        //Language Config Manager setup
         String lang = configManager.getString("lang");
 
         languageConfigManager = new LanguageConfigManager(this, lang);
         languageConfigManager.updateLanguageConfigs();
 
+        //ItemStackEncoder setup
+        itemStackEncoder = new ItemStackEncoder();
+
+        //database setup
         String serverName = getConfig().getString("serverName");
         dbUrl = "jdbc:" + getConfig().getString("database.url");
         dbUser = getConfig().getString("database.user");

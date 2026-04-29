@@ -22,7 +22,8 @@ public class ConfigManager {
         FileConfiguration savedConfig = plugin.getConfig();
 
         for(String key : newConfig.getKeys(true)) {
-            String value = newConfig.getString(key);
+            String value = newConfig.getString(key, null);
+            if (value == null) continue;
             if (!savedConfig.contains(value)) {
                 plugin.getConfig().set(key, value);
             }
@@ -39,7 +40,6 @@ public class ConfigManager {
         return plugin.getConfig().getString(key, def);
     }
 
-    public void reloadConfig() {}
     public void saveDefaultConfig() {
         plugin.saveDefaultConfig();
     }
