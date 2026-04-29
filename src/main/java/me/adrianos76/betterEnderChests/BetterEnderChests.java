@@ -39,7 +39,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     int serverID;
 
     ConfigManager configManager;
-    LanguageConfigManager  languageConfigManager;
+    public LanguageConfigManager  languageConfigManager;
 
     private final Map<UUID, Inventory> playersWithOpenInventories = new HashMap<>();
 

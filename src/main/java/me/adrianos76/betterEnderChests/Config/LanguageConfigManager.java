@@ -80,9 +80,6 @@ public class LanguageConfigManager {
             throw new RuntimeException(e);
         }
 
-        plugin.getLogger().info("JAR path: " + jarFile.getAbsolutePath());
-        plugin.getLogger().info("JAR exists: " + jarFile.exists());
-
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
             boolean foundAny = false;
@@ -93,25 +90,25 @@ public class LanguageConfigManager {
 
                 if (name.startsWith("translations/") && name.endsWith(".yml")) {
                     foundAny = true;
-                    plugin.getLogger().info("Found translation in JAR: " + name);
 
                     File file = new File(plugin.getDataFolder(), name);
-                    plugin.getLogger().info("Target file: " + file.getAbsolutePath());
-                    plugin.getLogger().info("Target file exists: " + file.exists());
 
                     file.getParentFile().mkdirs();
-                    plugin.getLogger().info("mkdirs result: " + file.getParentFile().exists());
 
                     updateLanguageConfig(name);
                 }
             }
 
             if (!foundAny) {
-                plugin.getLogger().warning("No translation files found in JAR under translations/");
+                plugin.getLogger().warning(plugin.languageConfigManager.getString("Config-No-Translations-In-Jar"));
             }
 
         } catch (IOException e) {
-            plugin.getLogger().severe("IOException while reading JAR: " + e.getMessage());
+            Map<String, String> variables = new HashMap<>();
+
+            variables.put("%err%", e.getMessage());
+
+            plugin.getLogger().severe(plugin.languageConfigManager.getString("Config-IOException-Reading-JAR-Error", variables));
             throw new RuntimeException(e);
         }
     }
