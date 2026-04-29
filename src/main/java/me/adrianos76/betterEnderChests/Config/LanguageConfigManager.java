@@ -5,8 +5,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class LanguageConfigManager {
     BetterEnderChests plugin;
@@ -28,8 +33,35 @@ public class LanguageConfigManager {
         this.config = YamlConfiguration.loadConfiguration(langFile);
     }
 
-    public void updateLanguageConfig() {
-        //TODO: implement
+    private void updateLanguageConfig(String configLang) {
+        plugin.getLogger().info(configLang);
+    }
+
+    public void updateLanguageConfigs() {
+        File jarFile;
+        try {
+            jarFile = new File(this.plugin.getClass()
+                    .getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        try (JarFile jar = new JarFile(jarFile)) {
+            Enumeration<JarEntry> entries = jar.entries();
+
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+
+                if (entry.getName().startsWith("translations/") && entry.getName().endsWith(".yml")) {
+                    updateLanguageConfig(entry.getName());
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getString(String key) {

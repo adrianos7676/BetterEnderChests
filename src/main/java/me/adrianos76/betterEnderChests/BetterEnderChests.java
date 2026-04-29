@@ -521,10 +521,13 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         }
         
         //Language Config Manager
-        
         String lang = configManager.getString("lang");
 
         languageConfigManager = new LanguageConfigManager(this, lang);
+
+        if (!localVersion.equals(configVersion)) {
+            languageConfigManager.updateLanguageConfigs();
+        }
 
         String serverName = getConfig().getString("serverName");
         dbUrl = "jdbc:" + getConfig().getString("database.url");
