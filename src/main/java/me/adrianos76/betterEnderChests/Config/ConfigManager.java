@@ -21,9 +21,10 @@ public class ConfigManager {
         );
         FileConfiguration savedConfig = plugin.getConfig();
 
-        for(String value : newConfig.getKeys(true)) {
+        for(String key : newConfig.getKeys(true)) {
+            String value = newConfig.getString(key);
             if (!savedConfig.contains(value)) {
-                plugin.getConfig().set(key);
+                plugin.getConfig().set(key, value);
             }
         }
     }

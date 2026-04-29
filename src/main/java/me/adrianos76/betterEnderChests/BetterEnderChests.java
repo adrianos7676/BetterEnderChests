@@ -35,7 +35,6 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 //TODO: Divide the code into classes
-//TODO: Add a config version system
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
     Connection dbConnection;
