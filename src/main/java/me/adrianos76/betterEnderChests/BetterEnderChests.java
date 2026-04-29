@@ -1,10 +1,12 @@
 package me.adrianos76.betterEnderChests;
 
+import me.adrianos76.betterEnderChests.Config.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -33,10 +35,13 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
 //TODO: Divide the code into classes
+//TODO: Add a config version system
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
     Connection dbConnection;
     int serverID;
+
+    ConfigManager configManager;
 
     FileConfiguration langConfig;
 
@@ -525,7 +530,18 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
 
-        saveDefaultConfig();
+        //Config Manager
+        configManager = new ConfigManager(this);
+
+        configManager.saveDefaultConfig();
+
+        //Update the config if its an old version
+        String localVersion = getDescription().getVersion();
+        String configVersion = configManager.getString("configVersion");
+
+        if (!localVersion.equals(configVersion)) {
+            configManager.updateConfig();
+        }
 
         String lang = getConfig().getString("lang");
 

@@ -4,3 +4,5 @@ database:
   url: "mariadb://localhost:3306/BetterEnderChests"
   user: "enderchest"
   password: "YOUR-DATABASE-PASS-HERE"
+
+configVersion: 2.0 # DO NOT DOUCH
