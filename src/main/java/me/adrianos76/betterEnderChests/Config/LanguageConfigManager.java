@@ -6,7 +6,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +36,42 @@ public class LanguageConfigManager {
         this.config = YamlConfiguration.loadConfiguration(langFile);
     }
 
-    private void updateLanguageConfig(String configLang) {
-        plugin.getLogger().info(configLang);
+    private void updateLanguageConfig(String resourcePath) {
+        File langFile = new File(plugin.getDataFolder(), resourcePath);
+
+        FileConfiguration existing = langFile.exists()
+                ? YamlConfiguration.loadConfiguration(langFile)
+                : new YamlConfiguration();
+
+        InputStream jarStream = plugin.getResource(resourcePath);
+        if (jarStream == null) return;
+
+        FileConfiguration defaults = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(jarStream, StandardCharsets.UTF_8)
+        );
+
+        boolean changed = false;
+        for (String key : defaults.getKeys(true)) {
+            if (!existing.contains(key)) {
+                existing.set(key, defaults.get(key));
+                changed = true;
+                plugin.getLogger().info("Added missing key '" + key + "' to " + resourcePath);
+            }
+        }
+
+        if (changed) {
+            try {
+                existing.save(langFile);
+            } catch (IOException e) {
+                plugin.getLogger().severe("Could not save " + resourcePath + ": " + e.getMessage());
+            }
+        }
     }
 
     public void updateLanguageConfigs() {
         File jarFile;
         try {
-            jarFile = new File(this.plugin.getClass()
+            jarFile = new File(plugin.getClass()
                     .getProtectionDomain()
                     .getCodeSource()
                     .getLocation()
@@ -51,12 +82,16 @@ public class LanguageConfigManager {
 
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
-
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (name.startsWith("translations/") && name.endsWith(".yml")) {
+                    File file = new File(plugin.getDataFolder(), name);
+                    file.getParentFile().mkdirs();
 
-                if (entry.getName().startsWith("translations/") && entry.getName().endsWith(".yml")) {
-                    updateLanguageConfig(entry.getName());
+                    if (file.exists()) {
+                        updateLanguageConfig(name);
+                    }
                 }
             }
         } catch (IOException e) {
