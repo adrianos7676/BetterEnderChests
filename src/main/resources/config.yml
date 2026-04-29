@@ -5,4 +5,4 @@ database:
   user: "enderchest"
   password: "YOUR-DATABASE-PASS-HERE"
 
-configVersion: 2.0 # DO NOT DOUCH
+configVersion: 2.1 # DO NOT DOUCH
