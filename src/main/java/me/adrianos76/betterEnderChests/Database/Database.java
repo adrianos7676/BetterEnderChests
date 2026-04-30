@@ -1,4 +1,4 @@
-package me.adrianos76.betterEnderChests.database;
+package me.adrianos76.betterEnderChests.Database;
 
 import me.adrianos76.betterEnderChests.BetterEnderChests;
 
