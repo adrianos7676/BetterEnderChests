@@ -2,9 +2,7 @@ package me.adrianos76.betterEnderChests.database;
 
 import me.adrianos76.betterEnderChests.BetterEnderChests;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,8 +15,9 @@ public class Database {
     private String dbUrl;
     private String dbUser;
     private String dbPassword;
+    public int serverID;
 
-    public Database(BetterEnderChests plugin, String dbUrl, String dbUser, String dbPassword) {
+    public Database(BetterEnderChests plugin, String serverName, String dbUrl, String dbUser, String dbPassword) {
         this.plugin = plugin;
         this.dbUrl = dbUrl;
         this.dbUser = dbUser;
@@ -28,6 +27,36 @@ public class Database {
             plugin.getServer().getPluginManager().disablePlugin(plugin);
         }
 
+        ensureConnection();
+
+        String query = "SELECT id FROM server WHERE name = ?";
+
+        try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+            stmt.setString(1, serverName);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    serverID = rs.getInt("id");
+                } else {
+                    plugin.getLogger().info("Adding server to database."); //TODO: ADD TO LANGCONFIG
+
+                    String insert = "INSERT INTO server (name) VALUES (?)";
+
+                    try (PreparedStatement insertStmt = dbConnection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
+                        insertStmt.setString(1, serverName);
+                        insertStmt.executeUpdate();
+
+                        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                            if (generatedKeys.next()) {
+                                serverID = generatedKeys.getInt(1);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean checkDatabaseValues() {

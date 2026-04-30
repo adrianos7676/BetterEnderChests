@@ -33,7 +33,7 @@ import java.util.UUID;
 //TODO: Divide the code into classes
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
-    int serverID;
+
 
     Database database;
     ConfigManager configManager;
@@ -94,7 +94,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
             try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, userID);
-                stmt.setInt(2, serverID);
+                stmt.setInt(2, database.serverID);
                 stmt.setInt(3, chestNum);
                 stmt.setString(4, base64);
                 stmt.executeUpdate();
@@ -113,7 +113,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
             try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, userID);
-                stmt.setInt(2, serverID);
+                stmt.setInt(2, database.serverID);
                 stmt.setInt(3, chestNum);
 
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -280,7 +280,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
             try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, playerId);
-                stmt.setInt(2, serverID);
+                stmt.setInt(2, database.serverID);
                 stmt.setInt(3, chestNum);
                 stmt.executeUpdate();
             } catch (SQLException e) {
@@ -460,7 +460,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
         String dbUser = getConfig().getString("database.user");
         String dbPassword = getConfig().getString("database.password");
 
-        database = new Database(this, dbUrl, dbUser, dbPassword);
+        database = new Database(this, serverName, dbUrl, dbUser, dbPassword);
 
         if (!database.ensureConnection()) {
             getLogger().severe(languageConfigManager.getString("Database-Connection-Error"));
@@ -515,35 +515,6 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 }
                 currentQuery.setLength(0);
             }
-        }
-
-        String query = "SELECT id FROM server WHERE name = ?";
-
-        try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
-            stmt.setString(1, serverName);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    serverID = rs.getInt("id");
-                } else {
-                    getLogger().info("Adding server to database.");
-
-                    String insert = "INSERT INTO server (name) VALUES (?)";
-
-                    try (PreparedStatement insertStmt = database.dbConnection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
-                        insertStmt.setString(1, serverName);
-                        insertStmt.executeUpdate();
-
-                        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
-                            if (generatedKeys.next()) {
-                                serverID = generatedKeys.getInt(1);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
         Bukkit.getPluginManager().registerEvents(this, this);
