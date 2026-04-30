@@ -2,7 +2,7 @@ package me.adrianos76.betterEnderChests;
 
 import me.adrianos76.betterEnderChests.Config.ConfigManager;
 import me.adrianos76.betterEnderChests.Config.LanguageConfigManager;
-import me.adrianos76.betterEnderChests.Database.ItemStackEncoder;
+import me.adrianos76.betterEnderChests.database.ItemStackEncoder;
 import me.adrianos76.betterEnderChests.database.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

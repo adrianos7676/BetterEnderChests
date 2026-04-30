@@ -1,4 +1,4 @@
-package me.adrianos76.betterEnderChests.Database;
+package me.adrianos76.betterEnderChests.database;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.io.BukkitObjectInputStream;
