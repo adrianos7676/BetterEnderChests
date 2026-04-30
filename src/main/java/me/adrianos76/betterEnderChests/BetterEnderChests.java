@@ -454,7 +454,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         //database setup
         String serverName = getConfig().getString("serverName");
-        String dbUrl = "jdbc:" + getConfig().getString("database.url");
+        String dbUrl = "jdbc:" + getConfig().getString("database.type") + "://" +  getConfig().getString("database.host") + ":" + getConfig().getInt("database.port") + "/" + getConfig().getString("database.DBName");
         String dbUser = getConfig().getString("database.user");
         String dbPassword = getConfig().getString("database.password");
 

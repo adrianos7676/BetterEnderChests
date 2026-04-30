@@ -1,7 +1,10 @@
 lang: "en" # all suported languages are listed in the "translations" folder in the config
 serverName: "server" # the name for the database, if not needed leave as is
 database:
-  url: "mariadb://localhost:3306/BetterEnderChests"
+  type: "mariadb"
+  host: "localhost"
+  port: 3306
+  DBName: "BetterEnderChests"
   user: "enderchest"
   password: "YOUR-DATABASE-PASS-HERE"
 
