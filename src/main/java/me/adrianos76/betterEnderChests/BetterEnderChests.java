@@ -3,6 +3,7 @@ package me.adrianos76.betterEnderChests;
 import me.adrianos76.betterEnderChests.Config.ConfigManager;
 import me.adrianos76.betterEnderChests.Config.LanguageConfigManager;
 import me.adrianos76.betterEnderChests.Database.ItemStackEncoder;
+import me.adrianos76.betterEnderChests.database.Database;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -32,9 +33,9 @@ import java.util.UUID;
 //TODO: Divide the code into classes
 
 public final class BetterEnderChests extends JavaPlugin implements Listener {
-    Connection dbConnection;
     int serverID;
 
+    Database database;
     ConfigManager configManager;
     public LanguageConfigManager  languageConfigManager;
     ItemStackEncoder itemStackEncoder;
@@ -43,49 +44,12 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
     private final Map<UUID, String> viewingAs = new HashMap<>();
 
-    private String dbUrl;
-    private String dbUser;
-    private String dbPassword;
-
-    private boolean ensureConnection() {
-        try {
-            if (dbConnection != null && !dbConnection.isClosed() && dbConnection.isValid(2)) {
-                return true;
-            }
-        } catch (SQLException e) {
-            Map<String, String> params = new HashMap<>();
-            params.put("%err%", e.getMessage());
-            getLogger().warning(languageConfigManager.getString("Database-Reconnect-Fail-Error", params));
-        }
-
-        getLogger().warning(languageConfigManager.getString("Database-Connection-Retry-Warning"));
-
-        try {
-            if (dbConnection != null && !dbConnection.isClosed()) {
-                dbConnection.close();
-            }
-        } catch (SQLException ignored) {}
-
-        try {
-            dbConnection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
-            getLogger().info(languageConfigManager.getString("Database-Reconnect-Success-Message"));
-            return true;
-        } catch (SQLException e) {
-            Map<String, String> variables = new HashMap<>();
-            variables.put("%err%", e.getMessage());
-            getLogger().severe(languageConfigManager.getString("Database-Reconnect-Fail-Error",  variables));
-            return false;
-        }
-    }
-
-
-
     public int getUserFromDB(String userName) {
-        if (ensureConnection()) {
+        if (database.ensureConnection()) {
             String selectQuery = "SELECT id FROM user WHERE name = ?";
             String insertQuery = "INSERT INTO user (name) VALUES (?)";
 
-            try (PreparedStatement selectStmt = dbConnection.prepareStatement(selectQuery)) {
+            try (PreparedStatement selectStmt = database.dbConnection.prepareStatement(selectQuery)) {
                 selectStmt.setString(1, userName);
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
@@ -98,7 +62,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
                 getLogger().severe(languageConfigManager.getString("SQL-Select-Error", variables));
             }
 
-            try (PreparedStatement insertStmt = dbConnection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement insertStmt = database.dbConnection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                 insertStmt.setString(1, userName);
                 insertStmt.executeUpdate();
 
@@ -118,7 +82,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public void saveEnderChestToDB(ItemStack[] items, String userName, int chestNum) {
-        if (ensureConnection()) {
+        if (database.ensureConnection()) {
             String query = """
             INSERT INTO item (user_id, server_id, enderchest_number, itemdata)
             VALUES (?, ?, ?, ?)
@@ -128,7 +92,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             int userID = getUserFromDB(userName);
             String base64 = itemStackEncoder.itemStackArrayToBase64(items);
 
-            try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+            try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, userID);
                 stmt.setInt(2, serverID);
                 stmt.setInt(3, chestNum);
@@ -143,11 +107,11 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public ItemStack[] loadEnderChestFromDB(String userName, int chestNum) {
-        if (ensureConnection()) {
+        if (database.ensureConnection()) {
             String query = "SELECT itemdata FROM item WHERE user_id = ? AND server_id = ? AND enderchest_number = ?";
             int userID = getUserFromDB(userName);
 
-            try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+            try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, userID);
                 stmt.setInt(2, serverID);
                 stmt.setInt(3, chestNum);
@@ -310,11 +274,11 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
     }
 
     public void clearEnderChest(String playerName, int chestNum) {
-        if (ensureConnection()) {
+        if (database.ensureConnection()) {
             String query = "DELETE FROM item WHERE user_id = ? AND server_id = ? AND enderchest_number = ?";
             int playerId = getUserFromDB(playerName);
 
-            try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+            try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
                 stmt.setInt(1, playerId);
                 stmt.setInt(2, serverID);
                 stmt.setInt(3, chestNum);
@@ -492,17 +456,13 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         //database setup
         String serverName = getConfig().getString("serverName");
-        dbUrl = "jdbc:" + getConfig().getString("database.url");
-        dbUser = getConfig().getString("database.user");
-        dbPassword = getConfig().getString("database.password");
+        String dbUrl = "jdbc:" + getConfig().getString("database.url");
+        String dbUser = getConfig().getString("database.user");
+        String dbPassword = getConfig().getString("database.password");
 
-        if (serverName == null || dbUrl == null || dbUser == null || dbPassword == null) {
-            getLogger().severe(languageConfigManager.getString("Config-MissingDatabase-Settings"));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        database = new Database(this, dbUrl, dbUser, dbPassword);
 
-        if (!ensureConnection()) {
+        if (!database.ensureConnection()) {
             getLogger().severe(languageConfigManager.getString("Database-Connection-Error"));
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -548,7 +508,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
             currentQuery.append(line);
 
             if (line.endsWith(";")) {
-                try (Statement stmt = dbConnection.createStatement()) {
+                try (Statement stmt = database.dbConnection.createStatement()) {
                     stmt.execute(currentQuery.toString());
                 } catch (SQLException e) {
                     getLogger().severe("SQL error: " + e.getMessage());
@@ -559,7 +519,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
         String query = "SELECT id FROM server WHERE name = ?";
 
-        try (PreparedStatement stmt = dbConnection.prepareStatement(query)) {
+        try (PreparedStatement stmt = database.dbConnection.prepareStatement(query)) {
             stmt.setString(1, serverName);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -570,7 +530,7 @@ public final class BetterEnderChests extends JavaPlugin implements Listener {
 
                     String insert = "INSERT INTO server (name) VALUES (?)";
 
-                    try (PreparedStatement insertStmt = dbConnection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
+                    try (PreparedStatement insertStmt = database.dbConnection.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
                         insertStmt.setString(1, serverName);
                         insertStmt.executeUpdate();
 
